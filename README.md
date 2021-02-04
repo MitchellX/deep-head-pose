@@ -61,7 +61,9 @@ you **must** change the source code in `headpose_estimation_pairs_celeba_ffhq.py
     python headpose_estimation_pairs_celeba_ffhq.py celeba c3net  
 
 
-
+<div align="center">
+<img src="img/headpose_results.png" /><br><br>
+</div>
 
 
 ## Other pre-trained models:
