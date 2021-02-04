@@ -1,4 +1,4 @@
-# Hopenet #
+# headpose estimation
 
 <div align="center">
 <img src="img/example.png" /><br><br>
@@ -13,7 +13,7 @@ For details about the method and quantitative results please check the CVPR Work
 </div>
 
 
-## understand the euler angles
+# understand the euler angles
 ### the output is: [yaw, pitch, roll]
 `yaw(red) ∈ [-180, 180]`: represent face left & right rotation, left -, right +
 
@@ -26,20 +26,45 @@ For details about the method and quantitative results please check the CVPR Work
 </div>
 
 
-## How to use
-To use please install [PyTorch](http://pytorch.org/) and [OpenCV](https://opencv.org/) (for video) - I believe that's all you need apart from usual libraries such as numpy. You need a GPU to run Hopenet (for now).
+# How to use
 
-To test on a video using dlib face detections (center of head will be jumpy):
-```bash
-python code/test_on_video_dlib.py --snapshot PATH_OF_SNAPSHOT --face_model PATH_OF_DLIB_MODEL --video PATH_OF_VIDEO --output_string STRING_TO_APPEND_TO_OUTPUT --n_frames N_OF_FRAMES_TO_PROCESS --fps FPS_OF_SOURCE_VIDEO
-```
-To test on a video using your own face detections (we recommend using [dockerface](https://github.com/natanielruiz/dockerface), center of head will be smoother):
-```bash
-python code/test_on_video_dockerface.py --snapshot PATH_OF_SNAPSHOT --video PATH_OF_VIDEO --bboxes FACE_BOUNDING_BOX_ANNOTATIONS --output_string STRING_TO_APPEND_TO_OUTPUT --n_frames N_OF_FRAMES_TO_PROCESS --fps FPS_OF_SOURCE_VIDEO
-```
-Face bounding box annotations should be in Dockerface format (n_frame x_min y_min x_max y_max confidence).
+### environment:python2.7 (I recommend virtualenv)
+to use the `virtualenv`
+    
+    pip install virtualenv
 
-## Pre-trained models:
+set up and activate a virtual environment
+    
+    virtualenv headpose --python=2.7
+    source ./headpose/bin/activate
+
+install the packages:
+
+    pip install -r requirentments_python27.txt
+
+### download the pretrained model
+from the original author: (then put the pre-trained model in src folder)
+
+[300W-LP, alpha 1, robust to image quality](https://drive.google.com/open?id=1m25PrSE7g9D2q2XJVMR6IA7RaCvWSzCR)
+
+## test on an image folders
+
+    python headpose_estimation_imageFolder.py -i ~/path/to/yours/
+for more information:
+    
+    python headpose_estimation_imageFolder.py -h
+
+## calculate the `Euler-angle's` L2 distance between two images:
+
+you should change the source code in `headpose_estimation_pairs_celeba_ffhq.py`, here I give an example:
+
+    python headpose_estimation_pairs_celeba_ffhq.py celeba c3net  
+
+
+
+
+
+## Other pre-trained models:
 (all the following messages are from the original Github repo)
 
 [300W-LP, alpha 1](https://drive.google.com/open?id=1EJPu2sOAwrfuamTitTkw2xJ2ipmMsmD3)
@@ -48,22 +73,10 @@ Face bounding box annotations should be in Dockerface format (n_frame x_min y_mi
 
 [300W-LP, alpha 1, robust to image quality](https://drive.google.com/open?id=1m25PrSE7g9D2q2XJVMR6IA7RaCvWSzCR)
 
-For more information on what alpha stands for please read the paper. First two models are for validating paper results, if used on real data we suggest using the last model as it is more robust to image quality and blur and gives good results on video.
 
-Please open an issue if you have an problem.
+# Acknowledgment
 
-Some very cool implementations of this work on other platforms by some cool people:
-
-[Gluon](https://github.com/Cjiangbpcs/gazenet_mxJiang)
-
-[MXNet](https://github.com/haofanwang/mxnet-Head-Pose)
-
-[TensorFlow with Keras](https://github.com/Oreobird/tf-keras-deep-head-pose)
-
-A really cool lightweight version of HopeNet:
-
-[Deep Head Pose Light](https://github.com/OverEuro/deep-head-pose-lite)
-
+Thanks for the authors great work: https://github.com/natanielruiz/deep-head-pose
 
 If you find Hopenet useful in your research please cite:
 
