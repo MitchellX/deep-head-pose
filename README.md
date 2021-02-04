@@ -56,7 +56,7 @@ for more information:
 
 ## calculate the `Euler-angle's` L2 distance between two images:
 
-you should change the source code in `headpose_estimation_pairs_celeba_ffhq.py`, here I give an example:
+you **must** change the source code in `headpose_estimation_pairs_celeba_ffhq.py`, here I give an example:
 
     python headpose_estimation_pairs_celeba_ffhq.py celeba c3net  
 
