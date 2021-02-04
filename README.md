@@ -1,7 +1,7 @@
 # Hopenet #
 
 <div align="center">
-  <img src="https://i.imgur.com/K7jhHOg.png" width="380"><br><br>
+<img src="img/example.png" /><br><br>
 </div>
 
 **Hopenet** is an accurate and easy to use head pose estimation network. Models have been trained on the 300W-LP dataset and have been tested on real data with good qualitative performance.
@@ -20,6 +20,10 @@ For details about the method and quantitative results please check the CVPR Work
 `pitch(green) ∈ [-90, 90]`: represent head up & down move, up +, down -
 
 `roll(blue) ∈ [-180, 180]`: represent head left & right shake, head close to left shoulder +, head close to right shoulder - 
+
+<div align="center">
+<img src="img/euler_angle.jpg" /><br><br>
+</div>
 
 
 ## How to use
