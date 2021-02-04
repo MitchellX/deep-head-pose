@@ -1,0 +1,1 @@
+python2 test_on_video_dlib.py --snapshot /home/xiangmingcan/notespace/deep-head-pose/hopenet_robust_alpha1.pkl --face_model /home/xiangmingcan/notespace/deep-head-pose/mmod_human_face_detector.dat --video /home/xiangmingcan/notespace/deep-head-pose/cona.mp4 --output_string cona --n_frames 50 --fps 25

@@ -2,52 +2,53 @@ import dlib
 import sys, os, argparse
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 import torch
-import torch.nn as nn
 from torch.autograd import Variable
-from torch.utils.data import DataLoader
 from torchvision import transforms
 import torch.backends.cudnn as cudnn
 import torchvision
 import torch.nn.functional as F
 from PIL import Image
 import datasets, hopenet, utils
-from skimage import io
+
+join = os.path.join
 
 def parse_args():
     """Parse input arguments."""
-    parser = argparse.ArgumentParser(description='Head pose estimation using the Hopenet network.')
-    parser.add_argument('--gpu', dest='gpu_id', help='GPU device id to use [0]',
-            default=0, type=int)
-    parser.add_argument('--snapshot', dest='snapshot', help='Path of model snapshot.',
-          default='', type=str)
-    parser.add_argument('--face_model', dest='face_model', help='Path of DLIB face detection model.',
-          default='', type=str)
-    parser.add_argument('--video', dest='video_path', help='Path of video')
-    parser.add_argument('--output_string', dest='output_string', help='String appended to output file')
-    parser.add_argument('--n_frames', dest='n_frames', help='Number of frames', type=int)
-    parser.add_argument('--fps', dest='fps', help='Frames per second of source video', type=float, default=30.)
+    parser = argparse.ArgumentParser(description='Head pose estimation for images using the Hopenet network.')
+    parser.add_argument('--gpu', dest='gpu_id', help='GPU device id to use. Default: 0',
+                        default=0, type=int)
+    parser.add_argument('--snapshot', dest='snapshot', help='Path of model snapshot. Default: hopenet_robust_alpha1.pkl',
+                        default='/home/xiangmingcan/notespace/deep-head-pose/hopenet_robust_alpha1.pkl', type=str)
+    parser.add_argument('--face_model', dest='face_model', help='Path of DLIB face detection model. Default: mmod_human_face_detector.dat',
+                        default='/home/xiangmingcan/notespace/deep-head-pose/mmod_human_face_detector.dat', type=str)
+    parser.add_argument('-i', '--input folder', dest='input_path', help='Path of image folder',
+                        default='/home/xiangmingcan/notespace/cvpr_data/celeba/', type=str)
+    parser.add_argument('-o', '--output_txt', dest='output', help='Output path of txt file. Default: output/celeba.txt. \nNote: you must write output in this format',
+                        default='output/celeba.txt', type=str)
+    parser.add_argument('-f', '--flag', dest='flag', help='1: write the images; 0: do not write the images. Default: 1',
+                        default='1', type=int)
     args = parser.parse_args()
     return args
 
 
 if __name__ == '__main__':
     args = parse_args()
-
     cudnn.enabled = True
-
     batch_size = 1
     gpu = args.gpu_id
     snapshot_path = args.snapshot
-    out_dir = 'output/video'
-    video_path = args.video_path
+    input_path = args.input_path
 
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    out_dir = os.path.split(args.output)[0]
+    name = os.path.split(args.output)[1]
 
-    if not os.path.exists(args.video_path):
-        sys.exit('Video does not exist')
+    write_path = join(out_dir, "images_" + name[:-4])
+    if not os.path.exists(write_path):
+        os.makedirs(write_path)
+
+    if not os.path.exists(args.input_path):
+        sys.exit('Folder does not exist')
 
     # ResNet50 structure
     model = hopenet.Hopenet(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 66)
@@ -77,36 +78,17 @@ if __name__ == '__main__':
     idx_tensor = [idx for idx in range(66)]
     idx_tensor = torch.FloatTensor(idx_tensor).cuda(gpu)
 
-    video = cv2.VideoCapture(video_path)
+    # -------------- for image operation ------------------
+    images = os.listdir(input_path)
+    images = [_ for _ in images if (_.endswith('jpg') or _.endswith('png'))]
+    images.sort()
 
-    # New cv2
-    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))   # float
-    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
+    txt_out = open(args.output, 'w')
 
-    # Define the codec and create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-    out = cv2.VideoWriter('output/video/output-%s.avi' % args.output_string, fourcc, args.fps, (width, height))
+    for image_name in images:
+        image = cv2.imread(join(input_path, image_name))
 
-    # # Old cv2
-    # width = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))   # float
-    # height = int(video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)) # float
-    #
-    # # Define the codec and create VideoWriter object
-    # fourcc = cv2.cv.CV_FOURCC(*'MJPG')
-    # out = cv2.VideoWriter('output/video/output-%s.avi' % args.output_string, fourcc, 30.0, (width, height))
-
-    txt_out = open('output/video/output-%s.txt' % args.output_string, 'w')
-
-    frame_num = 1
-
-    while frame_num <= args.n_frames:
-        print frame_num
-
-        ret,frame = video.read()
-        if ret == False:
-            break
-
-        cv2_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+        cv2_frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         # Dlib detect
         dets = cnn_face_detector(cv2_frame, 1)
@@ -127,7 +109,7 @@ if __name__ == '__main__':
                 y_min -= 3 * bbox_height / 4
                 y_max += bbox_height / 4
                 x_min = max(x_min, 0); y_min = max(y_min, 0)
-                x_max = min(frame.shape[1], x_max); y_max = min(frame.shape[0], y_max)
+                x_max = min(image.shape[1], x_max); y_max = min(image.shape[0], y_max)
                 # Crop image
                 img = cv2_frame[y_min:y_max,x_min:x_max]
                 img = Image.fromarray(img)
@@ -149,14 +131,11 @@ if __name__ == '__main__':
                 roll_predicted = torch.sum(roll_predicted.data[0] * idx_tensor) * 3 - 99
 
                 # Print new frame with cube and axis
-                txt_out.write(str(frame_num) + ' %f %f %f\n' % (yaw_predicted, pitch_predicted, roll_predicted))
+                txt_out.write(str(image_name) + '\t%f %f %f\n' % (yaw_predicted, pitch_predicted, roll_predicted))
+                print(str(image_name) + '\t%f %f %f' % (yaw_predicted, pitch_predicted, roll_predicted))
                 # utils.plot_pose_cube(frame, yaw_predicted, pitch_predicted, roll_predicted, (x_min + x_max) / 2, (y_min + y_max) / 2, size = bbox_width)
-                utils.draw_axis(frame, yaw_predicted, pitch_predicted, roll_predicted, tdx = (x_min + x_max) / 2, tdy= (y_min + y_max) / 2, size = bbox_height/2)
-                # Plot expanded bounding box
-                # cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (0,255,0), 1)
+                drawed_img = utils.draw_axis(image, yaw_predicted, pitch_predicted, roll_predicted, tdx =(x_min + x_max) / 2, tdy=(y_min + y_max) / 2, size =bbox_height / 2)
 
-        out.write(frame)
-        frame_num += 1
+                # write the images
 
-    out.release()
-    video.release()
+                cv2.imwrite(join(write_path, image_name), drawed_img)

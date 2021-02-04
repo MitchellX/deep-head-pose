@@ -1,0 +1,1 @@
+python2 headpose_estimation_for_images.py --snapshot /home/xiangmingcan/notespace/deep-head-pose/hopenet_robust_alpha1.pkl --face_model /home/xiangmingcan/notespace/deep-head-pose/mmod_human_face_detector.dat --folder /home/xiangmingcan/notespace/cvpr_data/celeba/

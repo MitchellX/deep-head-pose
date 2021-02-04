@@ -1,0 +1,7 @@
+python headpose_estimation_pairs_forensics_vgg2.py vgg2 c3net
+python headpose_estimation_pairs_forensics_vgg2.py vgg2 c3net_wo_blending
+python headpose_estimation_pairs_forensics_vgg2.py vgg2 faceshifter
+python headpose_estimation_pairs_forensics_vgg2.py forensics c3net
+python headpose_estimation_pairs_forensics_vgg2.py forensics c3net_wo_blending
+python headpose_estimation_pairs_forensics_vgg2.py forensics faceshifter
+

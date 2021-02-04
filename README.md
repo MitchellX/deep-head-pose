@@ -12,11 +12,17 @@ For details about the method and quantitative results please check the CVPR Work
 <img src="conan-cruise.gif" /><br><br>
 </div>
 
-**new** [GoT trailer example video](https://youtu.be/OZdOrSLBQmI)
 
-**new** [Conan-Cruise-Car example video](https://youtu.be/Bz6eF4Nl1O8)
+## understand the euler angles
+### the output is: [yaw, pitch, roll]
+`yaw(red) ∈ [-180, 180]`: represent face left & right rotation, left -, right +
+
+`pitch(green) ∈ [-90, 90]`: represent head up & down move, up +, down -
+
+`roll(blue) ∈ [-180, 180]`: represent head left & right shake, head close to left shoulder +, head close to right shoulder - 
 
 
+## How to use
 To use please install [PyTorch](http://pytorch.org/) and [OpenCV](https://opencv.org/) (for video) - I believe that's all you need apart from usual libraries such as numpy. You need a GPU to run Hopenet (for now).
 
 To test on a video using dlib face detections (center of head will be jumpy):
@@ -29,7 +35,8 @@ python code/test_on_video_dockerface.py --snapshot PATH_OF_SNAPSHOT --video PATH
 ```
 Face bounding box annotations should be in Dockerface format (n_frame x_min y_min x_max y_max confidence).
 
-Pre-trained models:
+## Pre-trained models:
+(all the following messages are from the original Github repo)
 
 [300W-LP, alpha 1](https://drive.google.com/open?id=1EJPu2sOAwrfuamTitTkw2xJ2ipmMsmD3)
 

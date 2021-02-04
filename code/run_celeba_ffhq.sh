@@ -1,0 +1,7 @@
+# python headpose_estimation_pairs_celeba_ffhq.py ffhq c3net
+# python headpose_estimation_pairs_celeba_ffhq.py ffhq c3net_wo_blending
+# python headpose_estimation_pairs_celeba_ffhq.py ffhq faceshifter
+python headpose_estimation_pairs_celeba_ffhq.py celeba c3net
+python headpose_estimation_pairs_celeba_ffhq.py celeba c3net_wo_blending
+python headpose_estimation_pairs_celeba_ffhq.py celeba faceshifter
+
